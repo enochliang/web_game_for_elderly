@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>節奏拍手遊戲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            border: 4px solid white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .quadrant {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .quadrant-1 {
+            top: 0;
+            left: 0;
+            background-color: #ff6b6b;
+            border-bottom: 2px solid white;
+            border-right: 2px solid white;
+        }
+
+        .quadrant-2 {
+            top: 0;
+            right: 0;
+            background-color: #4ecdc4;
+            border-bottom: 2px solid white;
+            border-left: 2px solid white;
+        }
+
+        .quadrant-3 {
+            bottom: 0;
+            right: 0;
+            background-color: #45b7d1;
+            border-top: 2px solid white;
+            border-left: 2px solid white;
+        }
+
+        .quadrant-4 {
+            bottom: 0;
+            left: 0;
+            background-color: #96ceb4;
+            border-top: 2px solid white;
+            border-right: 2px solid white;
+        }
+
+        .quadrant.active {
+            transform: scale(1.05);
+            box-shadow: inset 0 0 50px rgba(255,255,255,0.5);
+            filter: brightness(1.3);
+        }
+
+        .quadrant.dim {
+            filter: brightness(0.4);
+        }
+
+        .star {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            animation: starPulse 0.6s ease-in-out infinite alternate;
+            z-index: 10;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        }
+
+        @keyframes starPulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .btn-stop {
+            background: linear-gradient(45deg, #666, #555);
+            color: white;
+        }
+
+        .btn-settings {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+
+
+        .score {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .instructions {
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .settings-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            color: #333;
+        }
+
+        .settings-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #333;
+        }
+
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.3rem;
+            padding: 0 10px; /* 對齊滑軌thumb的中心點 */
+        }
+
+        .slider-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .settings-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .star {
+                font-size: 3rem;
+            }
+
+            .settings-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="game-title">🎵 節奏拍手遊戲</h1>
+    
+    <div class="game-container">
+        <div class="quadrant quadrant-1">1</div>
+        <div class="quadrant quadrant-2">2</div>
+        <div class="quadrant quadrant-3">3</div>
+        <div class="quadrant quadrant-4">4</div>
+        <div class="star" id="star" style="display: none;">⭐</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" onclick="startGame()">開始遊戲</button>
+        <button class="btn btn-stop" onclick="stopGame()">停止</button>
+        <button class="btn btn-settings" onclick="openSettings()">⚙️ 設定</button>
+    </div>
+
+    <div class="instructions">
+        <p>🎯 當星星出現時快速拍手！</p>
+        <p>跟著節拍感受音樂的律動</p>
+    </div>
+
+    <!-- 設定彈窗 -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <h2 class="settings-title">⚙️ 遊戲設定</h2>
+            
+            <div class="setting-group">
+                <label class="setting-label">星星出現頻率</label>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="starFrequency" min="0" max="8" value="0" oninput="updateStarFrequencyDisplay()">
+                    <div class="slider-value" id="starFrequencyValue">低</div>
+                </div>
+                <div class="slider-labels">
+                    <span>低</span>
+                    <span>中</span>
+                    <span>高</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">節拍速度 (BPM)</label>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="bpmSlider" min="45" max="180" value="45" oninput="updateBpmDisplay()">
+                    <div class="slider-value" id="bpmValue">45</div>
+                </div>
+                <div class="slider-labels">
+                    <span>45</span>
+                    <span>112</span>
+                    <span>180</span>
+                </div>
+            </div>
+
+            <div class="settings-buttons">
+                <button class="btn btn-confirm" onclick="confirmSettings()">✓ 確認</button>
+                <button class="btn btn-cancel" onclick="cancelSettings()">✗ 取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameInterval;
+        let starTimeout;
+        let currentBeat = 0;
+        let isGameRunning = false;
+        let starVisible = false;
+        let starStartTime = 0;
+        
+        // 設定變數
+        let starFrequencyLevel = 0; // 0-8 (對應9個刻度)
+        let currentBpm = 45; // 45-180 BPM
+        let beatInterval = 60000 / 45; // 毫秒，根據BPM計算
+        
+        // 暫存設定 (用於取消時恢復)
+        let tempStarFrequency = 0;
+        let tempBpm = 45;
+        
+        const quadrants = document.querySelectorAll('.quadrant');
+        const star = document.getElementById('star');
+        
+        function startGame() {
+            if (isGameRunning) return;
+            
+            isGameRunning = true;
+            currentBeat = 0;
+            
+            // 重置所有象限
+            quadrants.forEach(q => {
+                q.classList.remove('active', 'dim');
+            });
+            
+            // 開始節拍循環
+            gameInterval = setInterval(() => {
+                playBeat();
+                scheduleRandomStar();
+            }, beatInterval);
+            
+            // 立即播放第一拍
+            playBeat();
+            scheduleRandomStar();
+        }
+        
+        function stopGame() {
+            isGameRunning = false;
+            clearInterval(gameInterval);
+            clearTimeout(starTimeout);
+            
+            // 重置所有象限
+            quadrants.forEach(q => {
+                q.classList.remove('active', 'dim');
+            });
+            
+            // 隱藏星星
+            star.style.display = 'none';
+            starVisible = false;
+        }
+        
+        function playBeat() {
+            // 重置所有象限
+            quadrants.forEach(q => {
+                q.classList.remove('active');
+                q.classList.add('dim');
+            });
+            
+            // 激活當前象限
+            const activeQuadrant = quadrants[currentBeat];
+            activeQuadrant.classList.remove('dim');
+            activeQuadrant.classList.add('active');
+            
+            // 移動到下一拍 (順時鐘: 0->1->2->3->0)
+            currentBeat = (currentBeat + 1) % 4;
+            
+            // 短暫延遲後恢復正常
+            setTimeout(() => {
+                if (isGameRunning) {
+                    activeQuadrant.classList.remove('active');
+                    quadrants.forEach(q => q.classList.remove('dim'));
+                }
+            }, beatInterval * 0.3);
+        }
+        
+        function scheduleRandomStar() {
+            // 清除之前的星星計時器
+            clearTimeout(starTimeout);
+            
+            // 根據設定的頻率等級計算出現機率
+            const frequencies = [0.05, 0.1, 0.15, 0.25, 0.35, 0.45, 0.55, 0.7, 0.85]; // 9個等級
+            const probability = frequencies[starFrequencyLevel];
+            
+            if (Math.random() < probability) {
+                // 星星與格子同時出現
+                showStar();
+            }
+        }
+        
+        function showStar() {
+            if (starVisible) return;
+            
+            starVisible = true;
+            starStartTime = Date.now();
+            
+            // 將星星定位到當前亮起的格子內
+            const activeQuadrant = quadrants[currentBeat === 0 ? 3 : currentBeat - 1];
+            const rect = activeQuadrant.getBoundingClientRect();
+            const containerRect = document.querySelector('.game-container').getBoundingClientRect();
+            
+            // 計算星星在格子內的相對位置
+            const relativeLeft = ((rect.left + rect.width/2) - containerRect.left) / containerRect.width * 100;
+            const relativeTop = ((rect.top + rect.height/2) - containerRect.top) / containerRect.height * 100;
+            
+            star.style.left = relativeLeft + '%';
+            star.style.top = relativeTop + '%';
+            star.style.display = 'block';
+            
+            // 星星與格子亮起時間一致，在格子變暗時消失
+            setTimeout(() => {
+                if (starVisible) {
+                    hideStar();
+                }
+            }, beatInterval * 0.3);
+        }
+        
+        function hideStar() {
+            starVisible = false;
+            star.style.display = 'none';
+        }
+        
+        function clap() {
+            if (!isGameRunning) return;
+            
+            if (starVisible) {
+                // 成功拍手！
+                hideStar();
+                
+                // 視覺反饋
+                flashSuccess();
+            } else {
+                // 錯誤拍手
+                flashError();
+            }
+        }
+        
+
+        
+        function flashSuccess() {
+            document.body.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+            setTimeout(() => {
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 200);
+        }
+        
+        function flashError() {
+            document.body.style.background = 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)';
+            setTimeout(() => {
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 200);
+        }
+        
+        // 鍵盤控制
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                clap();
+            }
+        });
+        
+        // 點擊象限也可以拍手
+        quadrants.forEach(quadrant => {
+            quadrant.addEventListener('click', clap);
+        });
+
+        // 設定相關函數
+        function openSettings() {
+            // 將當前設定複製到暫存變數
+            tempStarFrequency = starFrequencyLevel;
+            tempBpm = currentBpm;
+            
+            // 更新滑軌顯示
+            document.getElementById('starFrequency').value = starFrequencyLevel;
+            document.getElementById('bpmSlider').value = currentBpm;
+            updateStarFrequencyDisplay();
+            updateBpmDisplay();
+            
+            // 顯示設定彈窗
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function updateStarFrequencyDisplay() {
+            const value = parseInt(document.getElementById('starFrequency').value);
+            const labels = ['低', '低', '低', '中', '中', '中', '高', '高', '高'];
+            document.getElementById('starFrequencyValue').textContent = labels[value];
+        }
+
+        function updateBpmDisplay() {
+            const value = document.getElementById('bpmSlider').value;
+            document.getElementById('bpmValue').textContent = value;
+        }
+
+        function confirmSettings() {
+            // 套用新設定
+            starFrequencyLevel = parseInt(document.getElementById('starFrequency').value);
+            currentBpm = parseInt(document.getElementById('bpmSlider').value);
+            beatInterval = 60000 / currentBpm; // 重新計算節拍間隔
+            
+            // 如果遊戲正在進行，重新啟動以套用新設定
+            if (isGameRunning) {
+                stopGame();
+                setTimeout(() => startGame(), 100);
+            }
+            
+            // 關閉設定彈窗
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function cancelSettings() {
+            // 恢復原設定到滑軌
+            document.getElementById('starFrequency').value = tempStarFrequency;
+            document.getElementById('bpmSlider').value = tempBpm;
+            updateStarFrequencyDisplay();
+            updateBpmDisplay();
+            
+            // 關閉設定彈窗
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        // 點擊彈窗外部關閉
+        document.getElementById('settingsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cancelSettings();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9641b0ff67d8332d',t:'MTc1MzM0MjAwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

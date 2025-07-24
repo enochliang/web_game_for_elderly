@@ -3,366 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>水果快語 - 銀髮族反應力訓練遊戲</title>
+    <title>歡樂遊戲島</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap');
+        /* 您的 CSS 樣式維持不變 */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
         
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         
-        .fruit-card {
-            transition: all 0.3s ease-in-out;
-            animation: fadeIn 0.5s ease-in-out;
+        .game-card {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .category-btn {
+            transition: all 0.3s ease;
+            border-radius: 15px;
+            font-weight: 700;
         }
         
-        .pulse-animation {
-            animation: pulse 2s infinite;
+        .category-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
         
-        .button-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        .selector-btn {
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-weight: 600;
         }
         
-        .progress-bar {
-            transition: width 0.1s linear;
+        .selector-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .arrow-btn {
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .arrow-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .brain-icon {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+        }
+        
+        .mix-icon {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+        }
+        
+        .body-icon {
+            background: linear-gradient(45deg, #ffecd2, #fcb69f);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-orange-50 to-yellow-50 min-h-screen">
-    <!-- 遊戲標題 -->
-    <div class="text-center py-6">
-        <h1 class="text-5xl font-bold text-orange-600 mb-2">水果快語</h1>
+<body class="relative">
+    <div class="floating-shapes">
+        <div class="shape w-20 h-20 bg-pink-300 rounded-full top-10 left-10" style="animation-delay: 0s;"></div>
+        <div class="shape w-16 h-16 bg-yellow-300 rounded-lg top-20 right-20" style="animation-delay: 2s;"></div>
+        <div class="shape w-12 h-12 bg-blue-300 rounded-full bottom-20 left-20" style="animation-delay: 4s;"></div>
+        <div class="shape w-24 h-24 bg-green-300 rounded-lg bottom-10 right-10" style="animation-delay: 1s;"></div>
     </div>
 
-    <!-- 主遊戲區域 -->
-    <div class="max-w-4xl mx-auto px-4">
-        <!-- 遊戲開始畫面 -->
-        <div id="startScreen" class="text-center bg-white rounded-3xl shadow-lg p-8 mb-6">
-            <div class="mb-8">
-                <div class="text-6xl mb-4">🎯</div>
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">歡迎來到水果快語！</h2>
-                <p class="text-xl text-gray-600 mb-6">看到水果圖片時，請大聲說出水果的名稱</p>
-            </div>
-            
-            <!-- 難度選擇 -->
-            <div class="mb-8">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-4">選擇遊戲速度</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button onclick="setDifficulty('easy')" class="difficulty-btn bg-green-500 hover:bg-green-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
-                        <div class="text-3xl mb-2">🐌</div>
-                        簡單模式<br>
-                        <span class="text-sm">3-5秒</span>
-                    </button>
-                    <button onclick="setDifficulty('medium')" class="difficulty-btn bg-yellow-500 hover:bg-yellow-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
-                        <div class="text-3xl mb-2">🚶</div>
-                        中等模式<br>
-                        <span class="text-sm">2-3秒</span>
-                    </button>
-                    <button onclick="setDifficulty('hard')" class="difficulty-btn bg-red-500 hover:bg-red-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
-                        <div class="text-3xl mb-2">🏃</div>
-                        困難模式<br>
-                        <span class="text-sm">1-2秒</span>
-                    </button>
-                </div>
-            </div>
-            
-            <button id="startBtn" onclick="startGame()" class="bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold py-4 px-12 rounded-2xl button-hover transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                開始遊戲 🎮
-            </button>
+    <div class="container mx-auto px-4 py-8 relative z-10">
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-black text-white mb-4 drop-shadow-lg">
+                🎮 歡樂遊戲島 🎮
+            </h1>
+            <p class="text-2xl text-white/90 font-semibold">創意小遊戲大集合</p>
         </div>
 
-        <!-- 遊戲進行畫面 -->
-        <div id="gameScreen" class="hidden">
-            <!-- 水果顯示區 -->
-            <div class="bg-white rounded-3xl shadow-lg p-8 text-center mb-6">
-                <div id="fruitDisplay" class="fruit-card">
-                    <div class="text-8xl mb-4 pulse-animation">🍎</div>
-                    <h2 class="text-4xl font-bold text-gray-800 mb-2">蘋果</h2>
-                    <p class="text-xl text-gray-600">請大聲說出水果名稱！</p>
-                </div>
-            </div>
 
-            <!-- 遊戲控制區 -->
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <div class="text-xl font-semibold text-gray-700">
-                        模式: <span id="currentMode" class="text-orange-600">簡單</span>
-                    </div>
-                    <div class="text-xl font-semibold text-gray-700">
-                        圖片: <span id="imageCounter" class="text-blue-600">1</span>
-                    </div>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-12">
+            <div class="game-card p-6">
+                <div class="text-center mb-6">
+                    <button id="brain-btn" class="category-btn brain-icon w-full py-4 px-6 text-white text-xl">
+                        🧠 腦力激盪 (Brain)
+                    </button>
                 </div>
                 
-                <!-- 進度條 -->
-                <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
-                    <div id="progressBar" class="progress-bar bg-orange-500 h-3 rounded-full" style="width: 0%"></div>
+                <div class="flex items-center justify-center space-x-4">
+                    <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="changeBrainGame(-1)">
+                        ◀
+                    </button>
+                    <div id="brain-selector" class="selector-btn bg-pink-100 text-pink-700 px-6 py-3 min-w-[150px]">
+                        記憶大師
+                    </div>
+                    <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="changeBrainGame(1)">
+                        ▶
+                    </button>
                 </div>
                 
-                <div class="flex gap-4 justify-center">
-                    <button onclick="pauseGame()" id="pauseBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-semibold py-3 px-6 rounded-xl button-hover transition-all duration-300">
-                        ⏸️ 暫停
-                    </button>
-                    <button onclick="stopGame()" class="bg-red-500 hover:bg-red-600 text-white text-lg font-semibold py-3 px-6 rounded-xl button-hover transition-all duration-300">
-                        ⏹️ 結束
+
+            </div>
+
+            <div class="game-card p-6">
+                <div class="text-center mb-6">
+                    <button id="mix-btn" class="category-btn mix-icon w-full py-4 px-6 text-white text-xl">
+                        🎯 綜合挑戰 (Mix)
                     </button>
                 </div>
+                
+                <div class="flex items-center justify-center space-x-4">
+                    <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="changeMixGame(-1)">
+                        ◀
+                    </button>
+                    <div id="mix-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
+                        請選擇遊戲
+                    </div>
+                    <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="changeMixGame(1)">
+                        ▶
+                    </button>
+                </div>
+                
+
+            </div>
+
+            <div class="game-card p-6">
+                <div class="text-center mb-6">
+                    <button id="body-btn" class="category-btn body-icon w-full py-4 px-6 text-white text-xl">
+                        🏃 肢體協調 (Body)
+                    </button>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-4">
+                    <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="changeBodyGame(-1)">
+                        ◀
+                    </button>
+                    <div id="body-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
+                        請選擇遊戲
+                    </div>
+                    <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="changeBodyGame(1)">
+                        ▶
+                    </button>
+                </div>
+                
+
             </div>
         </div>
 
-        <!-- 暫停畫面 -->
-        <div id="pauseScreen" class="hidden text-center bg-white rounded-3xl shadow-lg p-8">
-            <div class="text-6xl mb-4">⏸️</div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-6">遊戲暫停</h2>
-            <div class="flex gap-4 justify-center">
-                <button onclick="resumeGame()" class="bg-green-500 hover:bg-green-600 text-white text-xl font-semibold py-4 px-8 rounded-2xl button-hover transition-all duration-300">
-                    ▶️ 繼續
-                </button>
-                <button onclick="stopGame()" class="bg-red-500 hover:bg-red-600 text-white text-xl font-semibold py-4 px-8 rounded-2xl button-hover transition-all duration-300">
-                    🏠 返回首頁
-                </button>
-            </div>
-        </div>
-
-        <!-- 結束畫面 -->
-        <div id="endScreen" class="hidden text-center bg-white rounded-3xl shadow-lg p-8">
-            <div class="text-6xl mb-4">🎉</div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">您做得真棒！</h2>
-            <p class="text-xl text-gray-600 mb-6">感謝您的參與，繼續保持活力！</p>
-            <div class="mb-6">
-                <p class="text-lg text-gray-700">您總共看了 <span id="totalImages" class="text-orange-600 font-bold">0</span> 張水果圖片</p>
-            </div>
-            <button onclick="resetGame()" class="bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold py-4 px-12 rounded-2xl button-hover transition-all duration-300">
-                🔄 再玩一次
+        <div class="text-center">
+            <button class="start-btn text-white px-12 py-6 hover:scale-105" onclick="startGame()">
+                🚀 開始遊戲 🚀
             </button>
         </div>
     </div>
-
+    
     <script>
-        // 水果資料庫
-        const fruits = [
-            { emoji: '🍎', name: '蘋果', color: 'text-red-600' },
-            { emoji: '🍌', name: '香蕉', color: 'text-yellow-600' },
-            { emoji: '🍊', name: '橘子', color: 'text-orange-600' },
-            { emoji: '🍉', name: '西瓜', color: 'text-green-600' },
-            { emoji: '🍇', name: '葡萄', color: 'text-purple-600' },
-            { emoji: '🍍', name: '鳳梨', color: 'text-yellow-600' },
-            { emoji: '🍓', name: '草莓', color: 'text-red-600' },
-            { emoji: '🥭', name: '芒果', color: 'text-orange-600' },
-            { emoji: '🍑', name: '櫻桃', color: 'text-red-600' },
-            { emoji: '🍒', name: '櫻桃', color: 'text-red-600' },
-            { emoji: '🥝', name: '奇異果', color: 'text-green-600' },
-            { emoji: '🍋', name: '檸檬', color: 'text-yellow-600' },
-            { emoji: '🥥', name: '椰子', color: 'text-amber-600' },
-            { emoji: '🍐', name: '梨子', color: 'text-green-600' },
-            { emoji: '🫐', name: '藍莓', color: 'text-blue-600' },
-            { emoji: '🍈', name: '哈密瓜', color: 'text-orange-600' },
-            { emoji: '🥭', name: '芒果', color: 'text-yellow-600' },
-            { emoji: '🍎', name: '青蘋果', color: 'text-green-600' },
-            { emoji: '🍊', name: '柳橙', color: 'text-orange-600' },
-            { emoji: '🍇', name: '紫葡萄', color: 'text-purple-600' }
-        ];
+        // 遊戲資料結構，先宣告一個空物件，等待從 JSON 檔案載入
+        let games = {};
 
-        // 遊戲狀態
-        let gameState = {
-            isPlaying: false,
-            isPaused: false,
-            currentFruit: null,
-            imageCount: 0,
-            difficulty: 'easy',
-            timer: null,
-            progressTimer: null,
-            timeLeft: 0,
-            maxTime: 3500
+        // 當前選擇的狀態 (維持不變)
+        let currentSelections = {
+            brain: -1,
+            mix: -1,
+            body: -1
         };
 
-        // 難度設定
-        const difficultySettings = {
-            easy: { min: 3000, max: 5000, name: '簡單' },
-            medium: { min: 2000, max: 3000, name: '中等' },
-            hard: { min: 1000, max: 2000, name: '困難' }
-        };
+        // 更新顯示函式 (需要修改以適應新的資料結構)
+        function updateDisplay(category) {
+            // 先檢查該類別是否有遊戲，以防設定檔中沒有該類別
+            if (!games[category] || games[category].length === 0) {
+                const selector = document.getElementById(`${category}-selector`);
+                selector.textContent = '尚無遊戲';
+                selector.className = 'selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]';
+                return;
+            }
 
-        // 設定難度
-        function setDifficulty(level) {
-            gameState.difficulty = level;
-            document.getElementById('startBtn').disabled = false;
+            const selector = document.getElementById(`${category}-selector`);
+            const currentIndex = currentSelections[category];
             
-            // 更新按鈕樣式
-            document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                btn.classList.remove('ring-4', 'ring-blue-300');
-            });
-            event.target.classList.add('ring-4', 'ring-blue-300');
+            if (currentIndex === -1) {
+                selector.textContent = '請選擇遊戲';
+                selector.className = 'selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]';
+            } else {
+                // *** 修改點 ***: 從遊戲物件中取得 name 屬性
+                const gameName = games[category][currentIndex].name;
+                selector.textContent = gameName;
+                
+                // Update colors based on category
+                if (category === 'brain') {
+                    selector.className = 'selector-btn bg-pink-100 text-pink-700 px-6 py-3 min-w-[150px]';
+                } else if (category === 'mix') {
+                    selector.className = 'selector-btn bg-teal-100 text-teal-700 px-6 py-3 min-w-[150px]';
+                } else if (category === 'body') {
+                    selector.className = 'selector-btn bg-orange-100 text-orange-700 px-6 py-3 min-w-[150px]';
+                }
+            }
         }
 
-        // 開始遊戲
+        // 統一的遊戲切換函式 (更簡潔)
+        function changeGame(category, direction) {
+            if (!games[category] || games[category].length === 0) return; // 如果該類別沒有遊戲，則不執行任何操作
+
+            const maxIndex = games[category].length - 1;
+            if (currentSelections[category] === -1) {
+                currentSelections[category] = 0;
+            } else {
+                currentSelections[category] = (currentSelections[category] + direction + games[category].length) % games[category].length;
+            }
+            updateDisplay(category);
+            updateCategoryButton(category);
+        }
+
+        // 連結到 HTML 的 onclick 事件
+        const changeBrainGame = (dir) => changeGame('brain', dir);
+        const changeMixGame = (dir) => changeGame('mix', dir);
+        const changeBodyGame = (dir) => changeGame('body', dir);
+
+        function updateCategoryButton(category) {
+            const btn = document.getElementById(`${category}-btn`);
+            if (currentSelections[category] !== -1) {
+                btn.classList.add('active');
+            }
+        }
+
+        // 開始遊戲函式 (需要修改以讀取路徑)
         function startGame() {
-            gameState.isPlaying = true;
-            gameState.isPaused = false;
-            gameState.imageCount = 0;
+            const selectedGames = [];
             
-            document.getElementById('startScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            document.getElementById('currentMode').textContent = difficultySettings[gameState.difficulty].name;
-            
-            showNextFruit();
-        }
-
-        // 顯示下一個水果
-        function showNextFruit() {
-            if (!gameState.isPlaying || gameState.isPaused) return;
-            
-            gameState.imageCount++;
-            document.getElementById('imageCounter').textContent = gameState.imageCount;
-            
-            // 隨機選擇水果
-            const randomIndex = Math.floor(Math.random() * fruits.length);
-            const fruit = fruits[randomIndex];
-            gameState.currentFruit = fruit;
-            
-            // 初始顯示（不顯示名稱）
-            const fruitDisplay = document.getElementById('fruitDisplay');
-            fruitDisplay.innerHTML = `
-                <div class="text-8xl mb-4 pulse-animation">${fruit.emoji}</div>
-                <h2 id="fruitName" class="text-4xl font-bold text-gray-400 mb-2">?</h2>
-                <p class="text-xl text-gray-600">請大聲說出水果名稱！</p>
-            `;
-            
-            // 設定下次切換時間
-            const settings = difficultySettings[gameState.difficulty];
-            const nextTime = Math.random() * (settings.max - settings.min) + settings.min;
-            gameState.maxTime = nextTime;
-            gameState.timeLeft = nextTime;
-            
-            // 開始進度條動畫
-            startProgressBar();
-            
-            // 設定定時器 - 時間結束時顯示答案然後切換
-            gameState.timer = setTimeout(() => {
-                showAnswer();
-            }, nextTime);
-        }
-        
-        // 顯示答案
-        function showAnswer() {
-            if (!gameState.isPlaying || gameState.isPaused) return;
-            
-            const fruitNameElement = document.getElementById('fruitName');
-            if (fruitNameElement && gameState.currentFruit) {
-                fruitNameElement.textContent = gameState.currentFruit.name;
-                fruitNameElement.className = `text-4xl font-bold ${gameState.currentFruit.color} mb-2`;
-            }
-            
-            // 顯示答案1.5秒後切換到下一個水果
-            setTimeout(() => {
-                if (gameState.isPlaying && !gameState.isPaused) {
-                    showNextFruit();
-                }
-            }, 1500);
-        }
-
-        // 進度條動畫
-        function startProgressBar() {
-            const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = '100%';
-            
-            gameState.progressTimer = setInterval(() => {
-                if (gameState.isPaused) return;
-                
-                gameState.timeLeft -= 100;
-                const percentage = (gameState.timeLeft / gameState.maxTime) * 100;
-                progressBar.style.width = Math.max(0, percentage) + '%';
-                
-                if (gameState.timeLeft <= 0) {
-                    clearInterval(gameState.progressTimer);
-                }
-            }, 100);
-        }
-
-        // 暫停遊戲
-        function pauseGame() {
-            gameState.isPaused = true;
-            clearTimeout(gameState.timer);
-            clearInterval(gameState.progressTimer);
-            
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('pauseScreen').classList.remove('hidden');
-        }
-
-        // 繼續遊戲
-        function resumeGame() {
-            gameState.isPaused = false;
-            
-            document.getElementById('pauseScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            
-            // 繼續剩餘時間
-            startProgressBar();
-            gameState.timer = setTimeout(() => {
-                showNextFruit();
-            }, gameState.timeLeft);
-        }
-
-        // 結束遊戲
-        function stopGame() {
-            gameState.isPlaying = false;
-            gameState.isPaused = false;
-            clearTimeout(gameState.timer);
-            clearInterval(gameState.progressTimer);
-            
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('pauseScreen').classList.add('hidden');
-            document.getElementById('endScreen').classList.remove('hidden');
-            document.getElementById('totalImages').textContent = gameState.imageCount;
-        }
-
-        // 重置遊戲
-        function resetGame() {
-            gameState = {
-                isPlaying: false,
-                isPaused: false,
-                currentFruit: null,
-                imageCount: 0,
-                difficulty: 'easy',
-                timer: null,
-                progressTimer: null,
-                timeLeft: 0,
-                maxTime: 3500
-            };
-            
-            document.getElementById('endScreen').classList.add('hidden');
-            document.getElementById('startScreen').classList.remove('hidden');
-            document.getElementById('startBtn').disabled = true;
-            
-            // 重置難度選擇
-            document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                btn.classList.remove('ring-4', 'ring-blue-300');
-            });
-        }
-
-        // 鍵盤控制
-        document.addEventListener('keydown', function(event) {
-            if (event.code === 'Space') {
-                event.preventDefault();
-                if (gameState.isPlaying && !gameState.isPaused) {
-                    pauseGame();
-                } else if (gameState.isPaused) {
-                    resumeGame();
+            // 收集所有選擇的遊戲資訊
+            for (const category in currentSelections) {
+                if (currentSelections[category] !== -1) {
+                    // *** 修改點 ***: 取得完整的遊戲物件
+                    const gameInfo = games[category][currentSelections[category]];
+                    selectedGames.push(gameInfo);
                 }
             }
+            
+            if (selectedGames.length === 0) {
+                alert('請至少選擇一個遊戲！');
+                return;
+            }
+            
+            // 為了簡單起見，我們只啟動選擇的第一個遊戲
+            // 未來也可以設計成讓玩家選擇要啟動哪一個
+            const gameToStart = selectedGames[0];
+            
+            alert(`準備開始遊戲！\n\n即將進入：${gameToStart.name}`);
+            // *** 修改點 ***: 使用物件中的 path 來跳轉到遊戲的 index.html
+            window.location.href = `${gameToStart.path}index.html`;
+        }
+
+        // 當頁面載入完成後，執行非同步的初始化函式
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 使用 fetch 讀取本地的 JSON 設定檔
+                const response = await fetch('gamesConfig.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP 錯誤！ 狀態: ${response.status}`);
+                }
+                // 將從 JSON 取得的資料，直接賦值給 games 物件
+                games = await response.json();
+
+                console.log('成功從設定檔載入遊戲列表:', games);
+
+            } catch (error) {
+                console.error("無法讀取 gamesConfig.json:", error);
+                alert("讀取遊戲設定檔失敗，請檢查檔案是否存在且格式正確。");
+            }
+            
+            // 初始化所有顯示
+            updateDisplay('brain');
+            updateDisplay('mix');
+            updateDisplay('body');
         });
+
+        // Category button click handlers
+        document.getElementById('brain-btn').addEventListener('click', () => changeGame('brain', 0));
+        document.getElementById('mix-btn').addEventListener('click', () => changeGame('mix', 0));
+        document.getElementById('body-btn').addEventListener('click', () => changeGame('body', 0));
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'962f5300b7ee332d',t:'MTc1MzE0OTQxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
