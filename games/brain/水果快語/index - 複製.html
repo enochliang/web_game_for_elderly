@@ -137,16 +137,7 @@
                 🔄 再玩一次
             </button>
         </div>
-
-        <div id="finalScreen" class="hidden text-center bg-white rounded-3xl shadow-lg p-8">
-            <div class="text-6xl mb-4">⏰</div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">時間到！</h2>
-            <p class="text-xl text-gray-600 mb-6">來試試下一個遊戲吧！</p>
-            <button onclick="gotoNextGame()" class="bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-4 px-12 rounded-2xl button-hover transition-all duration-300">
-                下個遊戲
-            </button>
-        </div>
-        </div>
+    </div>
     <script>
         // ===== 修改開始：將水果資料庫從 emoji 改為圖片路徑 =====
         const FRUITS_DATABASE = [
@@ -193,10 +184,6 @@
         ];
 
         let fruits;
-        // ===== 新增變數 開始 =====
-        let nextgame_name = '';
-        let nextgame_url = '';
-        // ===== 新增變數 結束 =====
         // ===== 修改結束 =====
 
         // 遊戲狀態
@@ -225,7 +212,7 @@
 
         // 倒數計時器相關變數和函式
         let countdownTimerInterval = null;
-        let totalGameTimeSeconds = 10; // 遊戲總時間 (秒)
+        let totalGameTimeSeconds = 0.5 * 60; 
         let remainingGameTime = totalGameTimeSeconds;
 
         function updateCountdownDisplay() {
@@ -245,8 +232,8 @@
 
                 if (remainingGameTime <= 0) {
                     clearInterval(countdownTimerInterval);
-                    // ===== 修改：時間到，呼叫 final screen =====
-                    gotoFinalScreen(); 
+                    //stopGame(); // 時間到，結束遊戲
+                    window.location.href = 'https://www.google.com'
                 }
             }, 1000);
         }
@@ -423,69 +410,6 @@
                 btn.classList.remove('ring-4', 'ring-blue-300');
             });
         }
-        
-        // ===== 新增 Function 開始 =====
-
-        /**
-         * 時間到時，停止所有遊戲活動並顯示最終畫面
-         */
-        function gotoFinalScreen() {
-            gameState.isPlaying = false;
-            gameState.isPaused = false;
-            clearTimeout(gameState.timer);
-            clearInterval(gameState.progressTimer);
-            stopCountdown(); 
-
-            // 隱藏所有其他畫面
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('pauseScreen').classList.add('hidden');
-            document.getElementById('endScreen').classList.add('hidden');
-            document.getElementById('startScreen').classList.add('hidden');
-            
-            // 顯示最終畫面
-            document.getElementById('finalScreen').classList.remove('hidden');
-        }
-
-        /**
-         * 從外部檔案載入下一個遊戲的資訊
-         */
-        function loadNextGameInfo() {
-            fetch('next_game_info.js')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    nextgame_name = data.game_name;
-                    nextgame_url = data.game_url;
-                })
-                .catch(error => {
-                    console.error('無法載入下一個遊戲的資訊:', error);
-                    // 如果載入失敗，可以選擇禁用按鈕
-                    const nextGameBtn = document.querySelector('#finalScreen button');
-                    if(nextGameBtn) {
-                        nextGameBtn.disabled = true;
-                        nextGameBtn.textContent = '無法載入';
-                        nextGameBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                    }
-                });
-        }
-
-        /**
-         * 跳轉至下一個遊戲的 URL
-         */
-        function gotoNextGame() {
-            if (nextgame_url) {
-                window.location.href = nextgame_url;
-            } else {
-                alert('下一個遊戲的連結尚未載入或載入失敗！');
-                console.error('nextgame_url is not set.');
-            }
-        }
-        // ===== 新增 Function 結束 =====
-
 
         // 鍵盤控制
         document.addEventListener('keydown', function(event) {
@@ -498,10 +422,6 @@
                 }
             }
         });
-
-        // 頁面載入時，預先載入下一個遊戲的資訊
-        loadNextGameInfo();
-
     </script>
 </body>
 </html>
