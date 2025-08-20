@@ -6,62 +6,45 @@
     <title>歡樂遊戲島</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 您的 CSS 樣式維持不變 */
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
         body {
-            font-family: 'Nunito', sans-serif;
+            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== Main Menu Styles ===== */
+        #mainMenu {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-        
         .game-card {
             background: linear-gradient(145deg, #ffffff, #f0f0f0);
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
         }
-        
         .game-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 40px rgba(0,0,0,0.15);
         }
-        
         .category-btn {
             transition: all 0.3s ease;
             border-radius: 15px;
             font-weight: 700;
         }
-        
         .category-btn.active {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
-        
-        .selector-btn {
-            border-radius: 12px;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-        
-        .selector-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .arrow-btn {
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .arrow-btn:hover {
-            transform: scale(1.1);
-        }
-        
+        .selector-btn { border-radius: 12px; transition: all 0.2s ease; font-weight: 600; }
+        .selector-btn:hover { transform: scale(1.05); }
+        .arrow-btn { border-radius: 50%; transition: all 0.2s ease; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        .arrow-btn:hover { transform: scale(1.1); }
         .start-btn {
             background: linear-gradient(45deg, #ff6b6b, #feca57);
             border-radius: 25px;
@@ -70,261 +53,568 @@
             transition: all 0.3s ease;
             box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
         }
+        .start-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4); }
+        .brain-icon { background: linear-gradient(45deg, #ff9a9e, #fecfef); }
+        .mix-icon { background: linear-gradient(45deg, #a8edea, #fed6e3); }
+        .body-icon { background: linear-gradient(45deg, #ffecd2, #fcb69f); }
         
-        .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+        /* ===== General Game Session Styles ===== */
+        .game-session-background {
+             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
+
+        .button-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* ===== Fruit Game Styles ===== */
+        .item-card { transition: all 0.3s ease-in-out; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .pulse-animation { animation: pulse 2s infinite; }
+        .progress-bar { transition: width 0.1s linear; }
         
-        .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        
-        .shape {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-        
-        .brain-icon {
-            background: linear-gradient(45deg, #ff9a9e, #fecfef);
-        }
-        
-        .mix-icon {
-            background: linear-gradient(45deg, #a8edea, #fed6e3);
-        }
-        
-        .body-icon {
-            background: linear-gradient(45deg, #ffecd2, #fcb69f);
-        }
+        /* ===== Tempo Game Styles ===== */
+        #tempoGameContainer { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .tempo-game-grid { width: 400px; height: 400px; position: relative; border: 4px solid white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; }
+        .quadrant { position: absolute; width: 50%; height: 50%; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+        .quadrant-1 { top: 0; left: 0; background-color: #ff6b6b; border-bottom: 2px solid white; border-right: 2px solid white; }
+        .quadrant-2 { top: 0; right: 0; background-color: #4ecdc4; border-bottom: 2px solid white; border-left: 2px solid white; }
+        .quadrant-3 { bottom: 0; right: 0; background-color: #45b7d1; border-top: 2px solid white; border-left: 2px solid white; }
+        .quadrant-4 { bottom: 0; left: 0; background-color: #96ceb4; border-top: 2px solid white; border-right: 2px solid white; }
+        .quadrant.active { transform: scale(1.05); box-shadow: inset 0 0 50px rgba(255,255,255,0.5); filter: brightness(1.3); }
+        .quadrant.dim { filter: brightness(0.4); }
+        .star { position: absolute; transform: translate(-50%, -50%); font-size: 4rem; animation: starPulse 0.6s ease-in-out infinite alternate; z-index: 10; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); }
+        @keyframes starPulse { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-50%, -50%) scale(1.2); } }
+        .tempo-btn { padding: 12px 24px; border: none; border-radius: 25px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .tempo-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+
+        /* ===== Aerobic Game Styles ===== */
+        .video-container { position: relative; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="relative">
-    <div class="floating-shapes">
-        <div class="shape w-20 h-20 bg-pink-300 rounded-full top-10 left-10" style="animation-delay: 0s;"></div>
-        <div class="shape w-16 h-16 bg-yellow-300 rounded-lg top-20 right-20" style="animation-delay: 2s;"></div>
-        <div class="shape w-12 h-12 bg-blue-300 rounded-full bottom-20 left-20" style="animation-delay: 4s;"></div>
-        <div class="shape w-24 h-24 bg-green-300 rounded-lg bottom-10 right-10" style="animation-delay: 1s;"></div>
+<body class="bg-gray-100">
+
+    <div id="mainMenu">
+        <div class="container mx-auto px-4 py-8 relative z-10">
+            <div class="text-center mb-12">
+                <h1 class="text-6xl font-black text-white mb-4 drop-shadow-lg">🎮 歡樂遊戲島 🎮</h1>
+                <p class="text-2xl text-white/90 font-semibold">創意小遊戲大集合</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="game-card p-6">
+                    <div class="text-center mb-6">
+                        <button class="category-btn brain-icon w-full py-4 px-6 text-white text-xl">🧠 腦力激盪 (Brain)</button>
+                    </div>
+                    <div class="flex items-center justify-center space-x-4">
+                        <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="mainMenu.changeGame('brain', -1)">◀</button>
+                        <div id="brain-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
+                            請選擇遊戲
+                        </div>
+                        <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="mainMenu.changeGame('brain', 1)">▶</button>
+                    </div>
+                    <div class="flex items-center justify-center space-x-4 mt-4">
+                        <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="mainMenu.changeTime('brain', -1)">◀</button>
+                        <div id="brain-time-selector" class="selector-btn bg-pink-100 text-pink-700 px-6 py-3 min-w-[150px] text-center"></div>
+                        <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="mainMenu.changeTime('brain', 1)">▶</button>
+                    </div>
+                </div>
+                <div class="game-card p-6">
+                    <div class="text-center mb-6">
+                        <button class="category-btn mix-icon w-full py-4 px-6 text-white text-xl">🎯 綜合挑戰 (Mix)</button>
+                    </div>
+                    <div class="flex items-center justify-center space-x-4">
+                        <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="mainMenu.changeGame('mix', -1)">◀</button>
+                        <div id="mix-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
+                            請選擇遊戲
+                        </div>
+                        <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="mainMenu.changeGame('mix', 1)">▶</button>
+                    </div>
+                    <div class="flex items-center justify-center space-x-4 mt-4">
+                        <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="mainMenu.changeTime('mix', -1)">◀</button>
+                        <div id="mix-time-selector" class="selector-btn bg-teal-100 text-teal-700 px-6 py-3 min-w-[150px] text-center"></div>
+                        <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="mainMenu.changeTime('mix', 1)">▶</button>
+                    </div>
+                </div>
+                <div class="game-card p-6">
+                    <div class="text-center mb-6">
+                        <button class="category-btn body-icon w-full py-4 px-6 text-white text-xl">🏃 肢體協調 (Body)</button>
+                    </div>
+                    <div class="flex items-center justify-center space-x-4">
+                        <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="mainMenu.changeGame('body', -1)">◀</button>
+                        <div id="body-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
+                            請選擇遊戲
+                        </div>
+                        <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="mainMenu.changeGame('body', 1)">▶</button>
+                    </div>
+                    <div class="flex items-center justify-center space-x-4 mt-4">
+                        <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="mainMenu.changeTime('body', -1)">◀</button>
+                        <div id="body-time-selector" class="selector-btn bg-orange-100 text-orange-700 px-6 py-3 min-w-[150px] text-center"></div>
+                        <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="mainMenu.changeTime('body', 1)">▶</button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="start-btn text-white px-12 py-6 hover:scale-105" onclick="gameManager.startSession()">🚀 開始遊戲 🚀</button>
+            </div>
+        </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8 relative z-10">
-        <div class="text-center mb-12">
-            <h1 class="text-6xl font-black text-white mb-4 drop-shadow-lg">
-                🎮 歡樂遊戲島 🎮
-            </h1>
-            <p class="text-2xl text-white/90 font-semibold">創意小遊戲大集合</p>
-        </div>
+    <div id="gameSession" class="hidden min-h-screen flex flex-col justify-center items-center p-4 game-session-background">
 
-
-
-        <div class="grid md:grid-cols-3 gap-8 mb-12">
-            <div class="game-card p-6">
-                <div class="text-center mb-6">
-                    <button id="brain-btn" class="category-btn brain-icon w-full py-4 px-6 text-white text-xl">
-                        🧠 腦力激盪 (Brain)
-                    </button>
-                </div>
-                
-                <div class="flex items-center justify-center space-x-4">
-                    <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="changeBrainGame(-1)">
-                        ◀
-                    </button>
-                    <div id="brain-selector" class="selector-btn bg-pink-100 text-pink-700 px-6 py-3 min-w-[150px]">
-                        記憶大師
+        <div id="gameHeader" class="w-full max-w-4xl mx-auto mb-4">
+            <div class="bg-white rounded-2xl shadow-lg p-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-xl font-semibold text-gray-700">
+                        目前遊戲: <span id="currentGameName" class="text-blue-600"></span>
                     </div>
-                    <button class="arrow-btn bg-pink-200 hover:bg-pink-300 text-pink-600" onclick="changeBrainGame(1)">
-                        ▶
-                    </button>
-                </div>
-                
-
-            </div>
-
-            <div class="game-card p-6">
-                <div class="text-center mb-6">
-                    <button id="mix-btn" class="category-btn mix-icon w-full py-4 px-6 text-white text-xl">
-                        🎯 綜合挑戰 (Mix)
-                    </button>
-                </div>
-                
-                <div class="flex items-center justify-center space-x-4">
-                    <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="changeMixGame(-1)">
-                        ◀
-                    </button>
-                    <div id="mix-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
-                        請選擇遊戲
+                    <div class="text-xl font-semibold text-gray-700">
+                        剩餘時間: <span id="gameCountdownTimer" class="text-purple-600">00:00</span>
                     </div>
-                    <button class="arrow-btn bg-teal-200 hover:bg-teal-300 text-teal-600" onclick="changeMixGame(1)">
-                        ▶
+                    <button id="masterPauseBtn" onclick="gameManager.pauseCurrentGame()" class="bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-semibold py-2 px-5 rounded-xl button-hover">
+                        ⏸️ 暫停
                     </button>
                 </div>
-                
-
             </div>
-
-            <div class="game-card p-6">
-                <div class="text-center mb-6">
-                    <button id="body-btn" class="category-btn body-icon w-full py-4 px-6 text-white text-xl">
-                        🏃 肢體協調 (Body)
-                    </button>
-                </div>
-                
-                <div class="flex items-center justify-center space-x-4">
-                    <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="changeBodyGame(-1)">
-                        ◀
-                    </button>
-                    <div id="body-selector" class="selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]">
-                        請選擇遊戲
-                    </div>
-                    <button class="arrow-btn bg-orange-200 hover:bg-orange-300 text-orange-600" onclick="changeBodyGame(1)">
-                        ▶
-                    </button>
-                </div>
-                
-
-            </div>
-        </div>
-
-        <div class="text-center">
-            <button class="start-btn text-white px-12 py-6 hover:scale-105" onclick="startGame()">
-                🚀 開始遊戲 🚀
-            </button>
         </div>
     </div>
-    
+
+    <template id="template-say_the_fruit">
+        <div id="say_the_fruitGameWrapper" class="game-wrapper hidden w-full max-w-4xl">
+            <div class="max-w-4xl mx-auto px-4">
+            
+                <div id="fruitGameStartScreen" class="hidden text-center bg-white rounded-3xl shadow-lg p-8 mb-6">
+                    <div class="mb-8">
+                        <div class="text-6xl mb-4">🎯</div>
+                        <h2 class="text-5xl font-bold text-orange-600 mb-2">水果快語</h1>
+                        <p class="text-xl text-gray-600 mb-6">看到水果圖片時，請大聲說出水果的名稱</p>
+                    </div>
+                
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">選擇遊戲速度</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button data-difficulty="easy" class="difficulty-btn bg-green-500 hover:bg-green-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
+                                <div class="text-3xl mb-2">🐌</div>
+                                簡單模式<br>
+                                <span class="text-sm">3-5秒</span>
+                            </button>
+                            <button data-difficulty="medium" class="difficulty-btn bg-yellow-500 hover:bg-yellow-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
+                                <div class="text-3xl mb-2">🚶</div>
+                                中等模式<br>
+                                <span class="text-sm">2-3秒</span>
+                            </button>
+                            <button data-difficulty="hard" class="difficulty-btn bg-red-500 hover:bg-red-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
+                                <div class="text-3xl mb-2">🏃</div>
+                                困難模式<br>
+                                <span class="text-sm">1-2秒</span>
+                            </button>
+                        </div>
+                    </div>
+                
+                    <button id="fruitGameStartBtn" class="bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold py-4 px-12 rounded-2xl button-hover transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        開始遊戲 🎮
+                    </button>
+                </div>
+            
+                <div id="fruitGameMainScreen" class="hidden">
+                    <div class="bg-white rounded-3xl shadow-lg p-8 text-center mb-6">
+                        <div id="fruitDisplay" class="item-card">
+                            </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="text-xl font-semibold text-gray-700">
+                                模式: <span id="currentMode" class="text-orange-600">簡單</span>
+                            </div>
+                            <div class="text-xl font-semibold text-gray-700">
+                                圖片: <span id="imageCounter" class="text-blue-600">1</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                            <div id="fruitProgressBar" class="progress-bar bg-orange-500 h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+    </template>
+
+    <template id="template-say_the_animal">
+        <div id="say_the_animalGameWrapper" class="game-wrapper hidden w-full max-w-4xl">
+            <div class="max-w-4xl mx-auto px-4">
+
+                <div id="animalGameStartScreen" class="hidden text-center bg-white rounded-3xl shadow-lg p-8 mb-6">
+                    <div class="mb-8">
+                        <div class="text-6xl mb-4">🎯</div>
+                        <h2 class="text-5xl font-bold text-orange-600 mb-2">動物快語</h1>
+                        <p class="text-xl text-gray-600 mb-6">看到動物圖片時，請大聲說出動物的名稱</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">選擇遊戲速度</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button data-difficulty="easy" class="difficulty-btn bg-green-500 hover:bg-green-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
+                                <div class="text-3xl mb-2">🐌</div>
+                                簡單模式<br>
+                                <span class="text-sm">3-5秒</span>
+                            </button>
+                            <button data-difficulty="medium" class="difficulty-btn bg-yellow-500 hover:bg-yellow-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
+                                <div class="text-3xl mb-2">🚶</div>
+                                中等模式<br>
+                                <span class="text-sm">2-3秒</span>
+                            </button>
+                            <button data-difficulty="hard" class="difficulty-btn bg-red-500 hover:bg-red-600 text-white text-xl font-semibold py-4 px-6 rounded-2xl button-hover transition-all duration-300">
+                                <div class="text-3xl mb-2">🏃</div>
+                                困難模式<br>
+                                <span class="text-sm">1-2秒</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="animalGameStartBtn" class="bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold py-4 px-12 rounded-2xl button-hover transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        開始遊戲 🎮
+                    </button>
+                </div>
+
+                <div id="animalGameMainScreen" class="hidden">
+                    <div class="bg-white rounded-3xl shadow-lg p-8 text-center mb-6">
+                        <div id="animalDisplay" class="item-card">
+                            </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="text-xl font-semibold text-gray-700">
+                                模式: <span id="currentMode" class="text-orange-600">簡單</span>
+                            </div>
+                            <div class="text-xl font-semibold text-gray-700">
+                                圖片: <span id="imageCounter" class="text-blue-600">1</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                            <div id="animalProgressBar" class="progress-bar bg-orange-500 h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <template id="template-tempo_game">
+        <div id="tempoGameWrapper" class="game-wrapper hidden w-full max-w-4xl flex flex-col items-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-6">🎵 節奏拍手遊戲</h1>
+            <div id="tempoGameContainer" class="tempo-game-grid">
+                <div class="quadrant quadrant-1">1</div>
+                <div class="quadrant quadrant-2">2</div>
+                <div class="quadrant quadrant-3">3</div>
+                <div class="quadrant quadrant-4">4</div>
+                <div class="star" id="star" style="display: none;">⭐</div>
+            </div>
+             <div class="mt-6">
+                <p class="text-lg text-gray-700">🎯 當星星出現時快速拍手！ (可按空白鍵)</p>
+            </div>
+        </div>
+    </template>
+
+    <template id="template-aerobic_1">
+        <div id="aerobicGameWrapper" class="game-wrapper hidden w-full max-w-4xl">
+             <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-light text-gray-800">五行健康操</h1>
+            </div>
+            <div class="video-container">
+                <video id="aerobicVideo" class="w-full h-full object-cover" controls>
+                    <source src="video/五行健康操.mp4" type="video/mp4">
+                    您的瀏覽器不支援影片播放。
+                </video>
+            </div>
+        </div>
+    </template>
+
+    <div id="sharedPauseScreen" class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+        <div class="text-center bg-white rounded-3xl shadow-lg p-12">
+            <div class="text-6xl mb-4">⏸️</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-8">遊戲暫停</h2>
+            <div class="flex gap-4 justify-center">
+                <button onclick="gameManager.resumeCurrentGame()" class="bg-green-500 hover:bg-green-600 text-white text-xl font-semibold py-4 px-8 rounded-2xl button-hover">▶️ 繼續</button>
+                <button onclick="gameManager.endSession()" class="bg-red-500 hover:bg-red-600 text-white text-xl font-semibold py-4 px-8 rounded-2xl button-hover">🏠 返回首頁</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sessionCompleteScreen" class="hidden fixed inset-0 bg-gradient-to-br from-green-300 to-blue-300 flex justify-center items-center z-50">
+        <div class="text-center bg-white rounded-3xl shadow-2xl p-12 transform transition-all hover:scale-105 duration-500">
+            <div class="text-7xl mb-6">🎉</div>
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">活動結束！</h2>
+            <p class="text-2xl text-gray-600 mb-10">您已完成今日的所有遊戲，做得太棒了！</p>
+            <button onclick="gameManager.returnToMenu()" class="bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-4 px-12 rounded-2xl button-hover">返回主選單</button>
+        </div>
+    </div>
+
     <script>
-        // 遊戲資料結構，先宣告一個空物件，等待從 JSON 檔案載入
-        let games = {};
+        // ===============================================================
+        // ======================= LOAD GAME CLASSES =====================
+        // ===============================================================
+        async function initialize() {
+            try {
+                const gameClasses = await import('./game.js');
+                window.FruitGame = gameClasses.FruitGame;
+                window.AnimalGame = gameClasses.AnimalGame; // <-- 新增這一行
+                window.TempoGame = gameClasses.TempoGame;
+                window.AerobicGame = gameClasses.AerobicGame;
+                console.log("遊戲模組載入成功！");
+            } catch (error) {
+                console.error('載入模組時發生錯誤:', error);
+                // 可以在此處給使用者一個更友善的提示
+                alert('關鍵遊戲檔案載入失敗，請檢查網路連線並刷新頁面。');
+            }
+        }
 
-        // 當前選擇的狀態 (維持不變)
-        let currentSelections = {
-            brain: -1,
-            mix: -1,
-            body: -1
+        initialize();
+
+        
+
+
+        // ===============================================================
+        // =================== MAIN MENU & GAME MANAGER ==================
+        // ===============================================================
+
+        const mainMenu = {
+            gameData: {
+                brain: [ 
+                    { id: 'say_the_fruit', name: '水果快語' },
+                    { id: 'say_the_animal', name: '動物快語' }
+                 ],
+                mix: [ { id: 'tempo_game', name: '節奏拍手' } ],
+                body: [ { id: 'aerobic_1', name: '五行健康操' } ]
+            },
+            timeOptions: [
+                { text: '5 Sec (Test)', value: 5 }, { text: '5 min', value: 300 },
+                { text: '10 min', value: 600 }, { text: '15 min', value: 900 },
+            ],
+            selections: {
+                brain: { gameIndex: -1, timeIndex: 1 },
+                mix: { gameIndex: -1, timeIndex: 1 },
+                body: { gameIndex: -1, timeIndex: 1 },
+            },
+            init() { this.updateAllDisplays(); },
+            changeGame(category, direction) {
+                const categoryGames = this.gameData[category];
+                const current = this.selections[category];
+                if (current.gameIndex === -1) {
+                    if (direction === 1) { current.gameIndex = 0; }
+                    else if (direction === -1) { current.gameIndex = categoryGames.length - 1; }
+                } else {
+                    current.gameIndex = (current.gameIndex + direction + categoryGames.length) % categoryGames.length;
+                }
+                this.updateDisplay(category);
+            },
+            changeTime(category, direction) {
+                const current = this.selections[category];
+                current.timeIndex = (current.timeIndex + direction + this.timeOptions.length) % this.timeOptions.length;
+                this.updateDisplay(category);
+            },
+            updateDisplay(category) {
+                const gameSelector = document.getElementById(`${category}-selector`);
+                const timeSelector = document.getElementById(`${category}-time-selector`);
+                const gameIndex = this.selections[category].gameIndex;
+                const time = this.timeOptions[this.selections[category].timeIndex];
+                if (gameIndex === -1) {
+                    gameSelector.textContent = '請選擇遊戲';
+                } else {
+                    const game = this.gameData[category][gameIndex];
+                    gameSelector.textContent = game.name;
+                    const colors = {
+                        brain: 'bg-pink-100 text-pink-700',
+                        mix: 'bg-teal-100 text-teal-700',
+                        body: 'bg-orange-100 text-orange-700'
+                    };
+                    gameSelector.className = `selector-btn ${colors[category]} px-6 py-3 min-w-[150px]`;
+                }
+                timeSelector.textContent = time.text;
+            },
+            updateAllDisplays() { ['brain', 'mix', 'body'].forEach(cat => this.updateDisplay(cat)); },
+            getSelectedConfig() {
+                const config = {};
+                for (const category of ['brain', 'mix', 'body']) {
+                    const gameInfo = this.gameData[category][this.selections[category].gameIndex];
+                    const timeInfo = this.timeOptions[this.selections[category].timeIndex];
+                    config[category] = { id: gameInfo.id, name: gameInfo.name, time: timeInfo.value };
+                }
+                return config;
+            }
         };
 
-        // 更新顯示函式 (需要修改以適應新的資料結構)
-        function updateDisplay(category) {
-            // 先檢查該類別是否有遊戲，以防設定檔中沒有該類別
-            if (!games[category] || games[category].length === 0) {
-                const selector = document.getElementById(`${category}-selector`);
-                selector.textContent = '尚無遊戲';
-                selector.className = 'selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]';
-                return;
-            }
 
-            const selector = document.getElementById(`${category}-selector`);
-            const currentIndex = currentSelections[category];
+        const gameManager = {
+            gameQueue: [],
+            currentGameIndex: -1,
+            activeGame: null,
+            ui: {
+                mainMenu: document.getElementById('mainMenu'),
+                gameSession: document.getElementById('gameSession'),
+                gameContainer: document.getElementById('gameSession'), 
+                pauseScreen: document.getElementById('sharedPauseScreen'),
+                completeScreen: document.getElementById('sessionCompleteScreen'),
+                currentGameName: document.getElementById('currentGameName'),
+            },
+
+            // 這個函式保持不變
+            setupGameEventListeners(gameId) {
+                if (gameId === 'say_the_fruit' || gameId === 'say_the_animal') {
+                    const gameWrapper = document.getElementById(`${gameId.replace(/_(\d+)$/, '')}GameWrapper`);
+                    if (!gameWrapper) return;
+
+                    gameWrapper.querySelectorAll('.difficulty-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const clickedButton = e.target.closest('.difficulty-btn');
+                            if (this.activeGame && typeof this.activeGame.setDifficulty === 'function') {
+                                this.activeGame.setDifficulty(clickedButton.dataset.difficulty);
+                            }
+                        });
+                    });
+
+                    const startBtnId = gameId === 'say_the_fruit' ? 'fruitGameStartBtn' : 'animalGameStartBtn';
+                    const startBtn = document.getElementById(startBtnId);
+                    if (startBtn) {
+                        startBtn.addEventListener('click', () => {
+                            if (this.activeGame && typeof this.activeGame.confirmSettings === 'function') {
+                                this.activeGame.confirmSettings();
+                            }
+                        });
+                    }
+                }
+            },
             
-            if (currentIndex === -1) {
-                selector.textContent = '請選擇遊戲';
-                selector.className = 'selector-btn bg-gray-100 text-gray-500 px-6 py-3 min-w-[150px]';
-            } else {
-                // *** 修改點 ***: 從遊戲物件中取得 name 屬性
-                const gameName = games[category][currentIndex].name;
-                selector.textContent = gameName;
+            // 這個函式保持不變
+            loadGameUI(gameId) {
+                const template = document.getElementById(`template-${gameId}`);
+                if (!template) {
+                    console.error(`找不到 ID 為 "template-${gameId}" 的 template！`);
+                    return null;
+                }
+                const gameClone = document.importNode(template.content, true);
+                this.ui.gameContainer.appendChild(gameClone);
+                this.setupGameEventListeners(gameId);
+                // 返回新建立的 wrapper 元素
+                return this.ui.gameContainer.querySelector('.game-wrapper:last-child');
+            },
+            
+            // 這個函式保持不變
+            clearGameContainer() {
+                const wrappers = this.ui.gameContainer.querySelectorAll('.game-wrapper');
+                wrappers.forEach(wrapper => wrapper.remove());
+            },
+
+            // ===============================================================
+            // =================== 主要邏輯修改區域 START ==================
+            // ===============================================================
+            startSession() {
+                const selections = mainMenu.selections;
+                if (selections.brain.gameIndex === -1 || selections.mix.gameIndex === -1 || selections.body.gameIndex === -1) {
+                    alert('請為所有三個類別都選擇一個遊戲！');
+                    return;
+                }
                 
-                // Update colors based on category
-                if (category === 'brain') {
-                    selector.className = 'selector-btn bg-pink-100 text-pink-700 px-6 py-3 min-w-[150px]';
-                } else if (category === 'mix') {
-                    selector.className = 'selector-btn bg-teal-100 text-teal-700 px-6 py-3 min-w-[150px]';
-                } else if (category === 'body') {
-                    selector.className = 'selector-btn bg-orange-100 text-orange-700 px-6 py-3 min-w-[150px]';
+                // 步驟 1: 只建立遊戲設定的佇列，不載入UI或建立實例
+                const config = mainMenu.getSelectedConfig();
+                this.gameQueue = ['brain', 'mix', 'body'].map(category => config[category]);
+
+                this.ui.mainMenu.classList.add('hidden');
+                this.ui.gameSession.classList.remove('hidden');
+                this.currentGameIndex = -1;
+                this.startNextGame();
+            },
+
+            startNextGame() {
+                // 步驟 2: 先清除上一個遊戲的畫面
+                this.clearGameContainer();
+
+                this.currentGameIndex++;
+                if (this.currentGameIndex < this.gameQueue.length) {
+                    const gameData = this.gameQueue[this.currentGameIndex];
+                    
+                    // 步驟 3: 載入目前這個遊戲的UI，並取得其容器元素
+                    const containerElement = this.loadGameUI(gameData.id);
+                    if (!containerElement) {
+                        console.error(`無法為 ${gameData.id} 載入遊戲UI，終止流程。`);
+                        this.endSession();
+                        return;
+                    }
+                    
+                    // 步驟 4: 在UI載入後，才建立遊戲實例
+                    const gameConfig = {
+                        id: gameData.id,
+                        name: gameData.name, 
+                        timeLimit: gameData.time, 
+                        onComplete: () => this.startNextGame(),
+                        containerEl: containerElement
+                    };
+
+                    let gameInstance;
+                    switch (gameData.id) {
+                        case 'say_the_fruit': 
+                            gameInstance = new FruitGame(gameConfig); 
+                            break;
+                        case 'say_the_animal':
+                            gameInstance = new AnimalGame(gameConfig);
+                            break;
+                        case 'tempo_game': 
+                            gameInstance = new TempoGame(gameConfig); 
+                            break;
+                        case 'aerobic_1': 
+                            gameInstance = new AerobicGame(gameConfig); 
+                            break;
+                    }
+
+                    if (gameInstance) {
+                         this.activeGame = gameInstance;
+                         this.ui.currentGameName.textContent = this.activeGame.name;
+                         this.activeGame.start();
+                    }
+
+                } else {
+                    this.showCompletionScreen();
+                }
+            },
+
+            // ===============================================================
+            // =================== 主要邏輯修改區域 END ====================
+            // ===============================================================
+
+            endSession() {
+                if (this.activeGame) { this.activeGame.stop(); }
+                this.activeGame = null;
+                this.gameQueue = [];
+                this.ui.pauseScreen.classList.add('hidden');
+                this.clearGameContainer(); // 清理畫面
+                this.returnToMenu();
+            },
+
+            showCompletionScreen() {
+                 this.ui.gameSession.classList.add('hidden');
+                 this.ui.completeScreen.classList.remove('hidden');
+            },
+            returnToMenu() {
+                this.ui.gameSession.classList.add('hidden');
+                this.ui.completeScreen.classList.add('hidden');
+                this.ui.mainMenu.classList.remove('hidden');
+            },
+            pauseCurrentGame() {
+                if (this.activeGame) {
+                    this.activeGame.pause();
+                    this.ui.pauseScreen.classList.remove('hidden');
+                }
+            },
+            resumeCurrentGame() {
+                if (this.activeGame) {
+                    this.ui.pauseScreen.classList.add('hidden');
+                    this.activeGame.resume();
                 }
             }
-        }
+        };
 
-        // 統一的遊戲切換函式 (更簡潔)
-        function changeGame(category, direction) {
-            if (!games[category] || games[category].length === 0) return; // 如果該類別沒有遊戲，則不執行任何操作
-
-            const maxIndex = games[category].length - 1;
-            if (currentSelections[category] === -1) {
-                currentSelections[category] = 0;
-            } else {
-                currentSelections[category] = (currentSelections[category] + direction + games[category].length) % games[category].length;
-            }
-            updateDisplay(category);
-            updateCategoryButton(category);
-        }
-
-        // 連結到 HTML 的 onclick 事件
-        const changeBrainGame = (dir) => changeGame('brain', dir);
-        const changeMixGame = (dir) => changeGame('mix', dir);
-        const changeBodyGame = (dir) => changeGame('body', dir);
-
-        function updateCategoryButton(category) {
-            const btn = document.getElementById(`${category}-btn`);
-            if (currentSelections[category] !== -1) {
-                btn.classList.add('active');
-            }
-        }
-
-        // 開始遊戲函式 (需要修改以讀取路徑)
-        function startGame() {
-            const selectedGames = [];
-            
-            // 收集所有選擇的遊戲資訊
-            for (const category in currentSelections) {
-                if (currentSelections[category] !== -1) {
-                    // *** 修改點 ***: 取得完整的遊戲物件
-                    const gameInfo = games[category][currentSelections[category]];
-                    selectedGames.push(gameInfo);
-                }
-            }
-            
-            if (selectedGames.length === 0) {
-                alert('請至少選擇一個遊戲！');
-                return;
-            }
-            
-            // 為了簡單起見，我們只啟動選擇的第一個遊戲
-            // 未來也可以設計成讓玩家選擇要啟動哪一個
-            const gameToStart = selectedGames[0];
-            
-            alert(`準備開始遊戲！\n\n即將進入：${gameToStart.name}`);
-            // *** 修改點 ***: 使用物件中的 path 來跳轉到遊戲的 index.html
-            window.location.href = `${gameToStart.path}index.html`;
-        }
-
-        // 當頁面載入完成後，執行非同步的初始化函式
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                // 使用 fetch 讀取本地的 JSON 設定檔
-                const response = await fetch('gamesConfig.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP 錯誤！ 狀態: ${response.status}`);
-                }
-                // 將從 JSON 取得的資料，直接賦值給 games 物件
-                games = await response.json();
-
-                console.log('成功從設定檔載入遊戲列表:', games);
-
-            } catch (error) {
-                console.error("無法讀取 gamesConfig.json:", error);
-                alert("讀取遊戲設定檔失敗，請檢查檔案是否存在且格式正確。");
-            }
-            
-            // 初始化所有顯示
-            updateDisplay('brain');
-            updateDisplay('mix');
-            updateDisplay('body');
+        document.addEventListener('DOMContentLoaded', () => {
+            mainMenu.init();
         });
-
-        // Category button click handlers
-        document.getElementById('brain-btn').addEventListener('click', () => changeGame('brain', 0));
-        document.getElementById('mix-btn').addEventListener('click', () => changeGame('mix', 0));
-        document.getElementById('body-btn').addEventListener('click', () => changeGame('body', 0));
     </script>
+
 </body>
 </html>
